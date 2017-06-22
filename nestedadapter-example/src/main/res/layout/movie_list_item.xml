@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:background="#FF45"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/moviePicture"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginRight="20dp"
+        android:src="@android:drawable/ic_menu_gallery"/>
+
+    <TextView
+        android:id="@+id/movieTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:layout_toRightOf="@+id/moviePicture"
+        android:textColor="#FFF"
+        android:text="Title of the movie"/>
+
+    <TextView
+        android:id="@+id/movieType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="#FFF"
+        android:layout_below="@id/movieTitle"
+        android:layout_toRightOf="@+id/moviePicture"
+        android:text="01 January 2017"/>
+
+</RelativeLayout>

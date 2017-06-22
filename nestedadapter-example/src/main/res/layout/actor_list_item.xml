@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="3dp"
+    android:background="#6789"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/actorPicture"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginRight="3dp"
+        android:layout_centerVertical="true"
+        android:src="@android:drawable/ic_menu_my_calendar"/>
+
+    <TextView
+        android:id="@+id/actorName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_toRightOf="@+id/actorPicture"
+        android:textColor="#FFF"
+        android:layout_centerVertical="true"
+        android:text="Name of the actor"/>
+
+</RelativeLayout>

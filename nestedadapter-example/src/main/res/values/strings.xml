@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">nestedadapter-example</string>
+    <string name="wrapper_description">Star Wars is an American epic space opera franchise, centered on a film series created by George Lucas.</string>
+    <string name="star_wars_movies">Star Wars movies</string>
+</resources>
