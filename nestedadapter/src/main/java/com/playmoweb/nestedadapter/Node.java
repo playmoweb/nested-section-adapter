@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by thibaud on 21/06/2017.
+ * Node
+ * @author      Thibaud Giovannetti
+ * @by          Playmoweb
+ * @created     21/07/2017
  */
-
 public class Node {
     SectionAdapter adapter = null;
     List<Node> child = null;
 
-    public Node() {
-
-    }
+    public Node() { }
 
     public Node(SectionAdapter adapter) {
         this.adapter = adapter;
@@ -36,7 +36,6 @@ public class Node {
             child = new ArrayList<>();
         }
         child.add(toAdd);
-
         return this;
     }
 }

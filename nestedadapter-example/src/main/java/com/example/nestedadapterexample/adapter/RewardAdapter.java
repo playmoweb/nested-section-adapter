@@ -7,33 +7,21 @@ import android.widget.TextView;
 
 import com.example.nestedadapterexample.R;
 import com.example.nestedadapterexample.model.Reward;
-import com.playmoweb.nestedadapter.NestedSectionAdapter;
 import com.playmoweb.nestedadapter.SectionAdapter;
 
 /**
  * Created by thibaud on 22/06/2017.
  */
-
 public class RewardAdapter extends SectionAdapter<Reward> {
 
+    /**
+     * The top header of the rewards list
+     * @note    When the layout does not need customization, you can only override getHeaderResourceLayout()
+     */
     public static class RewardContainer extends SectionAdapter<Void> {
         @Override
-        public HeaderViewHolder onCreateHeaderViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View v = inflater.inflate(R.layout.reward_header_list_item, parent, false);
-            return new HeaderViewHolder(v);
-        }
-
-        @Override
-        public int getResourceTypeFor(NestedSectionAdapter.ViewType type) {
-            if(type == NestedSectionAdapter.ViewType.HEADER)
-                return R.layout.reward_header_list_item;
-            return 0;
-        }
-
-        @Override
-        public boolean hasHeader() {
-            return true;
+        protected Integer getHeaderResourceLayout() {
+            return R.layout.reward_header_list_item;
         }
     }
 
@@ -41,7 +29,7 @@ public class RewardAdapter extends SectionAdapter<Reward> {
         TextView rewardName;
         TextView rewardDate;
 
-        public RewardViewHolder(View itemView) {
+        RewardViewHolder(View itemView) {
             super(itemView);
             rewardName = (TextView) itemView.findViewById(R.id.rewardName);
             rewardDate = (TextView) itemView.findViewById(R.id.rewardDate);
@@ -65,15 +53,7 @@ public class RewardAdapter extends SectionAdapter<Reward> {
     }
 
     @Override
-    public boolean hasContent() {
-        return true;
-    }
-
-    @Override
-    public int getResourceTypeFor(NestedSectionAdapter.ViewType type) {
-        if(type == NestedSectionAdapter.ViewType.CONTENT){
-            return R.layout.reward_list_item;
-        }
-        return 0;
+    protected Integer getResourceLayout() {
+        return R.layout.reward_list_item;
     }
 }

@@ -20,6 +20,6 @@
         android:layout_marginTop="20dp"
         android:textColor="#FFF"
         android:textSize="18sp"
-        android:text="This example is provided by Playmoweb on their github page."/>
+        android:text="This example is provided on our github page:\ngithub.com/playmoweb"/>
 
 </LinearLayout>

@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * 
+ * MainActivity
+ * Display a list of movies
  */
 public class MainActivity extends AppCompatActivity {
-    private static final int MULTIPLIER_TO_DUPLICATE_MOVIES = 1;
-
-    private DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+    private static final int MULTIPLIER_TO_DUPLICATE_MOVIES = 1; // if you want to test a very long list, try to put 100 here (~7000 items generated)
+    private static final DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
 
     private RecyclerView myList;
     private MyListAdapter adapter;
@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         myList.requestFocus();
 
         ArrayList<Movie> allMovies = new ArrayList<>();
-        // you can change the MULTIPLIER_TO_DUPLICATE_MOVIES to increase the number of items for your tests
         for(int i = 0; i < MULTIPLIER_TO_DUPLICATE_MOVIES; i++) {
             allMovies.addAll(getMovies());
         }
@@ -49,8 +48,9 @@ public class MainActivity extends AppCompatActivity {
         adapter.setMovies(allMovies);
     }
 
-    // DATAS GENERATION
-
+    /**
+     * Create all movies with associated datas
+     */
     private List<Movie> getMovies(){
         List<Movie> movies = new ArrayList<>();
 

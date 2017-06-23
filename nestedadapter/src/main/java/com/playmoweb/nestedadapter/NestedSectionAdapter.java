@@ -6,13 +6,19 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 /**
- * Created by thibaud on 21/06/2017.
+ * NestedSectionAdapter
+ * @author      Thibaud Giovannetti
+ * @by          Playmoweb
+ * @created     21/07/2017
  */
 public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHolder> {
     public enum ViewType {
         HEADER, CONTENT, FOOTER
     }
 
+    /**
+     * Immutable class to store datas in flatenize()
+     */
     private class ItemAtPosition {
         final SectionAdapter adapter;
         final ViewType type;
@@ -30,7 +36,7 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
         registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                cachedOrderItems = flatenize(graph);
+                cachedOrderItems = flatenize(graph); // Observe data update and refresh cached datas
             }
         });
     }
@@ -54,9 +60,9 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
         throw new IndexOutOfBoundsException(viewType + " does not exist !");
     }
 
-    private ItemAtPosition getAdapterForType(int type){
+    private ItemAtPosition getAdapterForType(int layoutType){
         for(ItemAtPosition item : getCachedOrderItems()){
-            if(item.adapter.getResourceTypeFor(item.type) == type){
+            if(item.adapter.getResourceTypeFor(item.type) == layoutType){
                 return item;
             }
         }
@@ -76,7 +82,7 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
         ViewType type = ViewType.values()[found.type.ordinal()];
 
         int adapterStartPosition = 0;
-        for(int i = position - 1; i >= 0; i--){
+        for(int i = position - 1; i >= 0; i--){ // find the last common adapter position to define the index in it
             if(getCachedOrderItems().get(i).adapter != found.adapter){
                 break;
             }
@@ -110,6 +116,11 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
         return found.adapter.getResourceTypeFor(found.type);
     }
 
+    /**
+     * Transform a graph of Nodes into a flatten structure (ArrayList) to reduce access complexity to O(1)
+     * @note    This method is recursive and can use some memory when called.
+     * @todo    Rewrite/reverse this method to prevent memory usage on complexe graph.
+     */
     private ArrayList<ItemAtPosition> flatenize(Node currentNode){
         if(currentNode == null) {
             return new ArrayList<>(0);
@@ -117,15 +128,13 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
 
         ArrayList<ItemAtPosition> datas = new ArrayList<>();
         if(currentNode.getAdapter() != null){
-            final SectionAdapter adapter = currentNode.getAdapter();
-
-            if(adapter.hasHeader()) {
-                datas.add(new ItemAtPosition(adapter, ViewType.HEADER));
+            if(currentNode.getAdapter().hasHeader()) {
+                datas.add(new ItemAtPosition(currentNode.getAdapter(), ViewType.HEADER));
             }
 
-            if(adapter.hasContent()){
-                for(int i = 0, count = adapter.items.size(); i < count; i++) {
-                    datas.add(new ItemAtPosition(adapter, ViewType.CONTENT));
+            if(currentNode.getAdapter().hasContent()){
+                for(int i = 0, count = currentNode.getAdapter().items.size(); i < count; i++) {
+                    datas.add(new ItemAtPosition(currentNode.getAdapter(), ViewType.CONTENT));
                 }
             }
         }

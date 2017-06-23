@@ -7,7 +7,6 @@ import android.widget.TextView;
 
 import com.example.nestedadapterexample.R;
 import com.example.nestedadapterexample.model.Movie;
-import com.playmoweb.nestedadapter.NestedSectionAdapter;
 import com.playmoweb.nestedadapter.SectionAdapter;
 
 /**
@@ -48,15 +47,7 @@ public class MovieAdapter extends SectionAdapter<Movie> {
     }
 
     @Override
-    public boolean hasHeader() {
-        return true;
-    }
-
-    @Override
-    public int getResourceTypeFor(NestedSectionAdapter.ViewType type) {
-        if(type == NestedSectionAdapter.ViewType.HEADER){
-            return R.layout.movie_list_item;
-        }
-        return 0;
+    protected Integer getHeaderResourceLayout() {
+        return R.layout.movie_list_item;
     }
 }
