@@ -6,92 +6,137 @@ An adapter to allow multiple and nested sections in recycler view.
 
 An SectionAdapter can have :
 - A header
-- A content (list of items)
+- A content (list of items or another SectionAdapter)
 - A footer
 
 # Example
 
-In this example we will try to do this nested nested recycler view as below :
-- Header of the list
-  - Type of movie
-      - movie title
-          - Actors
-             - actor 1
-             - actor 2
-          - Rewards
-             - reward 1
-             - reward 2
-      - movie title
-          - Actors
-          - Rewards
-             - reward 1
-  - Type of movie
-      - movie title
-          - Actors
-             - actor 1
-             - actor 2
-          - Rewards
-             - reward 1
-             - reward 2
-      - movie title
-          - Actors
-             - actor 1
-          - Rewards
-- Footer of the list
+You can find a full working example in the nestedadapter-example folder.
 
+<div align="center">
+  <img src="web/preview-example.gif" alt="The list animated" />
+  <br />
+  <em>Star wars example</em>
+</div>
 
+# Usage
 
-Some data classes : 
+From the example. Define as many SectionAdapter you need :
 
 ```java
-class Movie {
-    private String name;
-    private String type;
-    private Date year;
-    
-    private List<Actor> actors;
-    private List<Reward> rewards;
-    
-    // ... getters & setters
-}
+public class WrapperAdapter extends SectionAdapter<Void> {
+    @Override
+    protected Integer getHeaderResourceLayout() {
+        return R.layout.wrapper_header;
+    }
 
-class Actor {
-    private String name;
-    private String description;
+    @Override
+    protected Integer getFooterResourceLayout() {
+        return R.layout.wrapper_footer;
+    }
 }
-
-class Reward {
-    private String name;
-    private Date obtained;
-}
-
 ```
 
-Create as many SectionAdapter you need :
+```java
+public class MovieAdapter extends SectionAdapter<Movie> {
+    private Movie movie;
+
+    public void setMovie(Movie movie) {
+        this.movie = movie;
+    }
+
+    private class MovieHeaderViewHolder extends HeaderViewHolder {
+        TextView movieTitle;
+        TextView movieType;
+
+        MovieHeaderViewHolder(View itemView) {
+            super(itemView);
+            movieTitle = (TextView) itemView.findViewById(R.id.movieTitle);
+            movieType = (TextView) itemView.findViewById(R.id.movieType);
+        }
+    }
+
+    @Override
+    public HeaderViewHolder onCreateHeaderViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View v = inflater.inflate(R.layout.movie_list_item, parent, false);
+        return new MovieHeaderViewHolder(v);
+    }
+
+    @Override
+    public void onBindHeaderViewHolder(HeaderViewHolder viewHolder, int position) {
+        MovieHeaderViewHolder header = (MovieHeaderViewHolder) viewHolder;
+
+        header.movieTitle.setText(movie.getName());
+        header.movieType.setText(movie.getType());
+    }
+
+    @Override
+    protected Integer getHeaderResourceLayout() {
+        return R.layout.movie_list_item;
+    }
+}
+```
+
+
+Actor adapter : 
 
 ```java
-class MovieAdapter extends SectionAdapter {
-    
-}
+public class ActorAdapter extends SectionAdapter<Actor> {
+    private class ActorViewHolder extends ViewHolder {
+        TextView actorName;
 
+        public ActorViewHolder(View itemView) {
+            super(itemView);
+            actorName = (TextView) itemView.findViewById(R.id.actorName);
+        }
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new ActorViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.actor_list_item, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+        ActorViewHolder view = (ActorViewHolder) viewHolder;
+        Actor actor = items.get(position); // get current actor for this position
+        view.actorName.setText(actor.getName());
+    }
+
+    @Override
+    protected Integer getResourceLayout() {
+        return R.layout.actor_list_item;
+    }
+}
 ```
 
 
 Create a class which inherit NestedSectionAdapter :
 
 ```java
-class UpcomingNestedOrderAdapter extends NestedSectionAdapter {
+class MovieNestedAdapter extends NestedSectionAdapter {
 
     public void setMovies(List<Movie> movies) {
-        
+        WrapperAdapter wrapperAdapter = new WrapperAdapter();
+        graph = new Node(wrapperAdapter); // create a root node
+
+        for(Movie movie : movies){
+            MovieAdapter movieAdapter = new MovieAdapter();
+            movieAdapter.setMovie(movie);
+
+            // actors
+            ActorAdapter actorsAdapter = new ActorAdapter();
+            actorsAdapter.setItems(movie.getActors());
+            
+            // create the Node and add them to the graph
+            Node movieNode = new Node(movieAdapter);
+            movieNode.addChild(new Node(actorsAdapter));
+            graph.addChild(movieNode);
+        }
+
         notifyDataSetChanged();
     }
 }
 
 ```
-
-
-# Objectives
-
-- Improve the recycling of similar items
-- Improve the notifyDataSetChanged
