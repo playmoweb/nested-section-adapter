@@ -2,6 +2,14 @@
 
 An adapter to allow multiple and nested sections in recycler view.
 
+## Import it with gradle
+
+How to import : https://jitpack.io/#playmoweb/nested-section-adapter
+
+```
+compile 'com.github.playmoweb:nested-section-adapter:1.0.0'
+```
+
 ## Structure
 
 An SectionAdapter can have :
