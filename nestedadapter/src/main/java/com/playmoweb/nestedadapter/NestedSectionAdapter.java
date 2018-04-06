@@ -1,5 +1,6 @@
 package com.playmoweb.nestedadapter;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
@@ -7,9 +8,10 @@ import java.util.ArrayList;
 
 /**
  * NestedSectionAdapter
- * @author      Thibaud Giovannetti
- * @by          Playmoweb
- * @created     21/07/2017
+ *
+ * @author Thibaud Giovannetti
+ * @by Playmoweb
+ * @created 21/07/2017
  */
 public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHolder> {
     public enum ViewType {
@@ -17,13 +19,13 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
     }
 
     /**
-     * Immutable class to store datas in flatenize()
+     * Immutable class to store datas in flatten()
      */
-    private class ItemAtPosition {
+    private static class ItemAtPosition {
         final SectionAdapter adapter;
         final ViewType type;
 
-        ItemAtPosition(SectionAdapter adapter, ViewType type) {
+        ItemAtPosition(final SectionAdapter adapter, final ViewType type) {
             this.adapter = adapter;
             this.type = type;
         }
@@ -36,15 +38,16 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
         registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
-                cachedOrderItems = flatenize(graph); // Observe data update and refresh cached datas
+                cachedOrderItems = flatten(graph); // Observe data update and refresh cached datas
             }
         });
     }
 
+    @NonNull
     @Override
-    public SectionAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ItemAtPosition found = getAdapterForType(viewType);
-        if(found == null){
+    public SectionAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
+        final ItemAtPosition found = getAdapterForType(viewType);
+        if (found == null) {
             throw new UnsupportedOperationException("There is no adapter to handle this type");
         }
 
@@ -60,36 +63,36 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
         throw new IndexOutOfBoundsException(viewType + " does not exist !");
     }
 
-    private ItemAtPosition getAdapterForType(int layoutType){
-        for(ItemAtPosition item : getCachedOrderItems()){
-            if(item.adapter.getResourceTypeFor(item.type) == layoutType){
+    private ItemAtPosition getAdapterForType(final int layoutType) {
+        for (final ItemAtPosition item : getCachedOrderItems()) {
+            if (item.adapter.getResourceTypeFor(item.type) == layoutType) {
                 return item;
             }
         }
         return null;
     }
 
-    private ArrayList<ItemAtPosition> getCachedOrderItems(){
-        if(cachedOrderItems == null){
-            cachedOrderItems = flatenize(graph);
+    private ArrayList<ItemAtPosition> getCachedOrderItems() {
+        if (cachedOrderItems == null) {
+            cachedOrderItems = flatten(graph);
         }
         return cachedOrderItems;
     }
 
     @Override
-    public void onBindViewHolder(SectionAdapter.ViewHolder holder, int position) {
-        ItemAtPosition found = getCachedOrderItems().get(position);
-        ViewType type = ViewType.values()[found.type.ordinal()];
+    public void onBindViewHolder(@NonNull final SectionAdapter.ViewHolder holder, final int position) {
+        final ItemAtPosition found = getCachedOrderItems().get(position);
+        final ViewType type = ViewType.values()[found.type.ordinal()];
 
         int adapterStartPosition = 0;
-        for(int i = position - 1; i >= 0; i--){ // find the last common adapter position to define the index in it
-            if(getCachedOrderItems().get(i).adapter != found.adapter){
+        for (int i = position - 1; i >= 0; i--) { // find the last common adapter position to define the index in it
+            if (getCachedOrderItems().get(i).adapter != found.adapter) {
                 break;
             }
             adapterStartPosition++;
         }
 
-        switch (type){
+        switch (type) {
             case HEADER:
                 found.adapter.onBindHeaderViewHolder((SectionAdapter.HeaderViewHolder) holder, adapterStartPosition);
                 break;
@@ -108,9 +111,9 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
     }
 
     @Override
-    public int getItemViewType(int position) {
-        ItemAtPosition found = cachedOrderItems.get(position);
-        if(found == null){
+    public int getItemViewType(final int position) {
+        final ItemAtPosition found = cachedOrderItems.get(position);
+        if (found == null) {
             throw new IndexOutOfBoundsException("Looks like there is no adapter for this index : " + position);
         }
         return found.adapter.getResourceTypeFor(found.type);
@@ -118,34 +121,35 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
 
     /**
      * Transform a graph of Nodes into a flatten structure (ArrayList) to reduce access complexity to O(1)
-     * @note    This method is recursive and can use some memory when called.
-     * @todo    Rewrite/reverse this method to prevent memory usage on complexe graph.
+     *
+     * @note This method is recursive and can use some memory when called.
+     * @todo Rewrite/reverse this method to prevent memory usage on complexe graph.
      */
-    private ArrayList<ItemAtPosition> flatenize(Node currentNode){
-        if(currentNode == null) {
+    private ArrayList<ItemAtPosition> flatten(final Node currentNode) {
+        if (currentNode == null) {
             return new ArrayList<>(0);
         }
 
-        ArrayList<ItemAtPosition> datas = new ArrayList<>();
-        if(currentNode.getAdapter() != null){
-            if(currentNode.getAdapter().hasHeader()) {
+        final ArrayList<ItemAtPosition> datas = new ArrayList<>();
+        if (currentNode.getAdapter() != null) {
+            if (currentNode.getAdapter().hasHeader()) {
                 datas.add(new ItemAtPosition(currentNode.getAdapter(), ViewType.HEADER));
             }
 
-            if(currentNode.getAdapter().hasContent()){
-                for(int i = 0, count = currentNode.getAdapter().items.size(); i < count; i++) {
+            if (currentNode.getAdapter().hasContent()) {
+                for (int i = 0, count = currentNode.getAdapter().items.size(); i < count; i++) {
                     datas.add(new ItemAtPosition(currentNode.getAdapter(), ViewType.CONTENT));
                 }
             }
         }
 
-        if(currentNode.child != null){
-            for(Node n : currentNode.getChilds()){
-                datas.addAll(flatenize(n));
+        if (currentNode.child != null) {
+            for (final Node n : currentNode.getChilds()) {
+                datas.addAll(flatten(n));
             }
         }
 
-        if(currentNode.getAdapter() != null && currentNode.getAdapter().hasFooter()) {
+        if (currentNode.getAdapter() != null && currentNode.getAdapter().hasFooter()) {
             datas.add(new ItemAtPosition(currentNode.getAdapter(), ViewType.FOOTER));
         }
 
