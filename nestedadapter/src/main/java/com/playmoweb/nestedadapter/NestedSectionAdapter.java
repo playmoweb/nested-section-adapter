@@ -63,22 +63,6 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
         throw new IndexOutOfBoundsException(viewType + " does not exist !");
     }
 
-    private ItemAtPosition getAdapterForType(final int layoutType) {
-        for (final ItemAtPosition item : getCachedOrderItems()) {
-            if (item.adapter.getResourceTypeFor(item.type) == layoutType) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    private ArrayList<ItemAtPosition> getCachedOrderItems() {
-        if (cachedOrderItems == null) {
-            cachedOrderItems = flatten(graph);
-        }
-        return cachedOrderItems;
-    }
-
     @Override
     public void onBindViewHolder(@NonNull final SectionAdapter.ViewHolder holder, final int position) {
         final ItemAtPosition found = getCachedOrderItems().get(position);
@@ -117,6 +101,43 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
             throw new IndexOutOfBoundsException("Looks like there is no adapter for this index : " + position);
         }
         return found.adapter.getResourceTypeFor(found.type);
+    }
+
+    /**
+     * Remove an item
+     */
+    protected void removeItem(final SectionAdapter adapter, final int position) {
+        int globalPosition = -1;
+        for (final ItemAtPosition cachedOrderItem : cachedOrderItems) {
+            if (cachedOrderItem.adapter == adapter) {
+                globalPosition += position;
+                cachedOrderItem.adapter.getItems().remove(position);
+                notifyItemRemoved(globalPosition);
+                flatten(graph); // re-flatten full graph
+                return;
+            } else {
+                globalPosition += cachedOrderItem.adapter.getItems() != null ? cachedOrderItem.adapter.getItems().size() : 0;
+                globalPosition += cachedOrderItem.adapter.hasHeader() ? 1 : 0;
+                globalPosition += cachedOrderItem.adapter.hasFooter() ? 1 : 0;
+            }
+        }
+
+    }
+
+    private ItemAtPosition getAdapterForType(final int layoutType) {
+        for (final ItemAtPosition item : getCachedOrderItems()) {
+            if (item.adapter.getResourceTypeFor(item.type) == layoutType) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    private ArrayList<ItemAtPosition> getCachedOrderItems() {
+        if (cachedOrderItems == null) {
+            cachedOrderItems = flatten(graph);
+        }
+        return cachedOrderItems;
     }
 
     /**
