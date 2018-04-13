@@ -113,6 +113,7 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
                 globalPosition += position;
                 cachedOrderItem.adapter.getItems().remove(position);
                 notifyItemRemoved(globalPosition);
+                notifyItemRangeChanged(globalPosition, cachedOrderItems.size());
                 cachedOrderItems = flatten(graph); // re-flatten full graph
                 return;
             } else {
