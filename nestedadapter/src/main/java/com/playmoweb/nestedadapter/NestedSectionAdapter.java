@@ -107,15 +107,12 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
      * Remove an item
      */
     protected void removeItem(final SectionAdapter adapter, final int position) {
-        int globalPosition = -1;
+        int globalPosition = 0;
+        ItemAtPosition cachedOrderItemFound = null;
         for (final ItemAtPosition cachedOrderItem : cachedOrderItems) {
             if (cachedOrderItem.adapter == adapter) {
-                globalPosition += position;
-                cachedOrderItem.adapter.getItems().remove(position);
-                notifyItemRemoved(globalPosition);
-                notifyItemRangeChanged(globalPosition, cachedOrderItems.size());
-                cachedOrderItems = flatten(graph); // re-flatten full graph
-                return;
+                cachedOrderItemFound = cachedOrderItem;
+                break;
             } else {
                 globalPosition += cachedOrderItem.adapter.getItems() != null ? cachedOrderItem.adapter.getItems().size() : 0;
                 globalPosition += cachedOrderItem.adapter.hasHeader() ? 1 : 0;
@@ -123,6 +120,13 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
             }
         }
 
+        if (cachedOrderItemFound != null) {
+            globalPosition += position;
+            cachedOrderItemFound.adapter.getItems().remove(position);
+            cachedOrderItems = flatten(graph); // re-flatten full graph
+            notifyItemRemoved(globalPosition);
+            notifyItemRangeChanged(globalPosition, cachedOrderItems.size());
+        }
     }
 
     private ItemAtPosition getAdapterForType(final int layoutType) {
