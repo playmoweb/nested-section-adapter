@@ -110,7 +110,7 @@ public class NestedSectionAdapter extends RecyclerView.Adapter<SectionAdapter.Vi
         int globalPosition = -1;
         for (final ItemAtPosition cachedOrderItem : cachedOrderItems) {
             if (cachedOrderItem.adapter == adapter) {
-                globalPosition += position + 1;
+                globalPosition += position;
                 cachedOrderItem.adapter.getItems().remove(position);
                 notifyItemRemoved(globalPosition);
                 cachedOrderItems = flatten(graph); // re-flatten full graph
